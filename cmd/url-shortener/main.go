@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"os"
 	"ulr-shortener/internal/config"
+	"ulr-shortener/internal/lib/logger/sl"
+	"ulr-shortener/internal/storage/sqlite"
 )
 
 const (
@@ -19,6 +21,14 @@ func main() {
 
 	log.Info("Starting url-shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages enabled")
+
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("failed to init storage", sl.Err(err))
+		os.Exit(1)
+	}
+
+	_ = storage
 }
 
 func setupLogger(env string) *slog.Logger {
