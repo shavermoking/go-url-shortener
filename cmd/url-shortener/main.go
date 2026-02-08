@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 	"ulr-shortener/internal/config"
+	"ulr-shortener/internal/http-server/handlers/url/save"
 	"ulr-shortener/internal/http-server/middleware/logger"
 	"ulr-shortener/internal/lib/logger/sl"
 	"ulr-shortener/internal/storage/sqlite"
@@ -39,6 +40,8 @@ func main() {
 	router.Use(logger.New(log))
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
+
+	router.Post("/url", save.New(log, storage))
 
 }
 
