@@ -46,7 +46,7 @@ func TestSaveHandler(t *testing.T) {
 			respError: "field URL is not a valid URL",
 		},
 		{
-			name:      "saveURL error",
+			name:      "SaveURL Error",
 			alias:     "test_alias",
 			url:       "https://google.com",
 			respError: "failed to add url",
@@ -60,15 +60,15 @@ func TestSaveHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			urlsaverMock := mocks.NewURLSaver(t)
+			urlSaverMock := mocks.NewURLSaver(t)
 
 			if tc.respError == "" || tc.mockError != nil {
-				urlsaverMock.On("SaveURL", tc.url, mock.AnythingOfType("string")).
+				urlSaverMock.On("SaveURL", tc.url, mock.AnythingOfType("string")).
 					Return(int64(1), tc.mockError).
 					Once()
 			}
 
-			handler := New(slogdiscard.NewDiscardLogger(), urlsaverMock)
+			handler := New(slogdiscard.NewDiscardLogger(), urlSaverMock)
 
 			input := fmt.Sprintf(`{"url": "%s", "alias": "%s"}`, tc.url, tc.alias)
 
@@ -77,8 +77,6 @@ func TestSaveHandler(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			handler.ServeHTTP(rr, req)
-			t.Logf("[%s] Response code: %d", tc.name, rr.Code)
-			t.Logf("[%s] Response body: %s", tc.name, rr.Body.String())
 
 			require.Equal(t, rr.Code, http.StatusOK)
 
@@ -90,6 +88,5 @@ func TestSaveHandler(t *testing.T) {
 
 			require.Equal(t, tc.respError, resp.Error)
 		})
-
 	}
 }
